@@ -3,7 +3,8 @@
 const LOCAL = ["localhost", "127.0.0.1", "[::1]", "::1"].includes(location.hostname);
 const MAC = /Mac/i.test(navigator.platform || navigator.userAgent);
 
-// ссылка → { path, cwd, files } или null: адрес «Файлов» /open?path=… или file:///…
+// ссылка → { path, cwd, files } или null: ссылка ленты (адрес «Файлов» #/<корень>/<путь>?session=…, путь, как его
+// написала сессия, — в data-path), /open?path=… или file:///…
 function target(a, snap) {
   let u;
   try { u = new URL(a.href, location.href); } catch { return null; }
@@ -12,11 +13,14 @@ function target(a, snap) {
     const path = decodeURIComponent(u.pathname).replace(/^\/([A-Za-z]:)/, "$1");
     return { path, cwd: "", files: `${location.protocol}//${location.hostname}:${port}/open?path=${encodeURIComponent(path)}` };
   }
-  if (u.pathname !== "/open" || u.port !== port || !u.searchParams.get("path")) return null;
-  let cwd = u.searchParams.get("cwd") || "";
-  const session = u.searchParams.get("session");
-  if (!cwd && session) cwd = (snap?.sessions || []).find((s) => s.name === session)?.cwd || "";
-  return { path: u.searchParams.get("path"), cwd, files: a.href };
+  if (u.port !== port) return null;
+  const sessionCwd = (name) => (name && (snap?.sessions || []).find((s) => s.name === name)?.cwd) || "";
+  if (u.pathname === "/" && u.hash.startsWith("#/") && a.dataset.path) {
+    const q = new URLSearchParams(u.hash.split("?")[1] || "");
+    return { path: a.dataset.path, cwd: sessionCwd(q.get("session")), files: a.href };
+  }
+  if (u.pathname !== "/open" || !u.searchParams.get("path")) return null;
+  return { path: u.searchParams.get("path"), cwd: u.searchParams.get("cwd") || sessionCwd(u.searchParams.get("session")), files: a.href };
 }
 
 export default function register(hub) {
