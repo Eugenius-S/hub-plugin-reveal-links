@@ -1,13 +1,15 @@
-# Ссылки → Finder — плагин Agents Hub
+# Links to Finder — an Agents Hub plugin
 
-Ссылки на файлы в чатах сессий: обычный клик открывает файл в «Файлах» хаба, ⌘-клик (Ctrl-клик на Windows) —
-папку с выделенным файлом: на Mac — Finder, на Windows — Проводник. Работает на компьютере, где стоит хаб; с телефона
-ссылки открываются в «Файлах».
+File links in session chats: a plain click opens the file in the hub's "Files", Cmd-click (Ctrl-click on Windows)
+opens the folder with the file selected: Finder on Mac, Explorer on Windows. Works on the computer where the hub runs;
+from a phone the links open in "Files".
 
-Нужен хаб с `/api/reveal` на странице (POST `{path, cwd}`); без него ⌘/Ctrl-клик открывает «Файлы».
+Needs a hub with `/api/reveal` on the page (POST `{path, cwd}`); without it Cmd/Ctrl-click opens "Files".
 
-Поставить: «Настройки» → «Плагины» → «Можно поставить» → reveal-links.
+Install: Settings -> Plugins -> Available -> reveal-links.
 
-Код — MIT.
+UI language: English, or Russian when the hub language is Russian.
 
-Иконка — [3D Fluency](https://icons8.com/icons/3d-fluency) от Icons8.
+Code — MIT.
+
+Icon — [3D Fluency](https://icons8.com/icons/3d-fluency) by Icons8.

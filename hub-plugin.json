@@ -1,9 +1,15 @@
 {
   "name": "reveal-links",
   "icon": "icon.png",
-  "description": "Ссылка на файл в чате открывает его в «Файлах» хаба, а ⌘-клик (Ctrl-клик на Windows) показывает файл в Finder или Проводнике",
-  "why": "Файл из ответа сразу видно в его папке",
-  "version": "1.2.3",
+  "description": "A file link in chat opens it in the hub's Files; Cmd-click (Ctrl-click on Windows) shows the file in Finder or Explorer",
+  "why": "A file from a reply is right there in its folder",
+  "version": "1.3.0",
   "hub": "^1.10",
-  "web": "main.js"
+  "web": "main.js",
+  "i18n": {
+    "ru": {
+      "description": "Ссылка на файл в чате открывает его в «Файлах» хаба, а ⌘-клик (Ctrl-клик на Windows) показывает файл в Finder или Проводнике",
+      "why": "Файл из ответа сразу видно в его папке"
+    }
+  }
 }

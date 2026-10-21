@@ -1,10 +1,22 @@
-// Ссылки на файлы в чатах: клик — файл в «Файлах» хаба, как без плагина; ⌘-клик (Ctrl-клик на Windows) — папка
-// с выделенным файлом (Finder на Mac, Проводник на Windows). Только на компьютере хаба: окно открывается на его экране.
+// File links in chats: a click opens the file in the hub's "Files", as without the plugin; Cmd-click (Ctrl-click on
+// Windows) shows the file in its folder (Finder on Mac, Explorer on Windows). Only on the hub computer: the window
+// opens on its screen.
 const LOCAL = ["localhost", "127.0.0.1", "[::1]", "::1"].includes(location.hostname);
 const MAC = /Mac/i.test(navigator.platform || navigator.userAgent);
 
-// ссылка → { path, cwd, files } или null: ссылка ленты (адрес «Файлов» #/<корень>/<путь>?session=…, путь, как его
-// написала сессия, — в data-path), /open?path=… или file:///…
+// UI strings: English by default, Russian when the hub language is Russian (other languages fall back to English).
+const STR = {
+  en: { open: "Open in Files ({key}-click: show in {app})", finder: "Finder", explorer: "Explorer" },
+  ru: { open: "Открыть в «Файлах» ({key}-клик — показать в {app})", finder: "Finder", explorer: "Проводнике" },
+};
+// hub.lang is read at use time, not at module load
+const t = (hub, k, v = {}) => {
+  const s = (STR[hub.lang] ?? STR.en)[k] ?? STR.en[k];
+  return s.replace(/\{(\w+)\}/g, (m, n) => v[n] ?? m);
+};
+
+// link -> { path, cwd, files } or null: a feed link (a "Files" address #/<root>/<path>?session=..., the path as the
+// session wrote it is in data-path), /open?path=... or file:///...
 function target(a, snap) {
   let u;
   try { u = new URL(a.href, location.href); } catch { return null; }
@@ -29,7 +41,7 @@ export default function register(hub) {
     const a = e.target.closest?.("a[href]");
     if (a && !a.dataset.reveal && target(a, hub.snapshot())) {
       a.dataset.reveal = "1";
-      a.title = `Открыть в «Файлах» (${MAC ? "⌘" : "Ctrl"}-клик — показать в ${MAC ? "Finder" : "Проводнике"})`;
+      a.title = t(hub, "open", { key: MAC ? "⌘" : "Ctrl", app: t(hub, MAC ? "finder" : "explorer") });
     }
   }, true);
   document.addEventListener("click", async (e) => {
@@ -38,10 +50,10 @@ export default function register(hub) {
     const t = a && target(a, hub.snapshot());
     if (!t) return;
     const reveal = MAC ? e.metaKey : e.ctrlKey;
-    if (!reveal && t.files === a.href) return;   // обычный клик по ссылке «Файлов» — как без плагина
+    if (!reveal && t.files === a.href) return;   // a plain click on a "Files" link: as without the plugin
     e.preventDefault();
     e.stopPropagation();
     if (reveal && !(await hub.post("/api/reveal", { path: t.path, cwd: t.cwd })).error) return;
-    window.open(t.files, "_blank", "noopener");   // file:/// браузер не откроет; не нашёлся в папке — «Файлы»
+    window.open(t.files, "_blank", "noopener");   // the browser will not open file:///; not found in the folder: open "Files"
   }, true);
 }
